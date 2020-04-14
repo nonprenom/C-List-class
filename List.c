@@ -1,25 +1,7 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct List_s
-{
-    void *value;
-
-    struct List_s *_next;
-    void (*delete)(struct List_s **);
-    void (*_push)(struct List_s *, void*);
-    void* (*_pop)(struct List_s *);
-
-    void (*pushInt)(struct List_s *, int);
-    int (*popInt)(struct List_s *);
-} List;
-
-void List_delete(List **this);
-void List_push(List *this, void *value);
-void* List_pop(List *this);
-void List_pushInt(List *this, int value);
-int List_popInt(List *this);
+#include "List.h"
 
 List* newList()
 {
@@ -98,20 +80,5 @@ int List_popInt(List *this)
     return intValue;
 }
 
-int main(int argc, char **argv)
-{
-    List* list = newList();
 
-    list->pushInt(list, 12);
-    list->pushInt(list, 8);
-    list->pushInt(list, 255);
-
-    printf("%d\n", list->popInt(list));
-    printf("%d\n", list->popInt(list));
-    printf("%d\n", list->popInt(list));
-
-    list->delete(&list);
-
-    return 0;
-}
 
