@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "xmalloc.h"
 #include "List.h"
 
 int main(int argc, char **argv)
@@ -21,7 +22,11 @@ int main(int argc, char **argv)
     list->pop(list, &value);
     printf("%d\n", value);
 
+    xmalloc_status();
+
     list->delete(&list);
 
+    xmalloc_status();
+    
     return 0;
 }
