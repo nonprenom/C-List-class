@@ -3,29 +3,32 @@
 
 #include "List.h"
 
-List* newList()
+List* __newList(const char *typeName, size_t typeSize)
 {
     List* list;
     list = (List*)malloc(sizeof(List));
 
-    list->_next = 0;
+    list->__typeName = (char*)malloc(sizeof(char)*strlen(typeName));
+    strcpy(list->__typeName, typeName);
+    list->__typeSize = typeSize;
+
+    list->__next = 0;
     list->value = 0;
     list->delete = &List_delete;
-    list->_push = &List_push;
-    list->_pop = &List_pop;
-    list->pushInt = &List_pushInt;
-    list->popInt = &List_popInt;
+    list->push = &List_push;
+    list->pop = &List_pop;
 }
 
 void List_delete(List **list)
 {
     List *this = *list;
-    if(this->_next != 0)
+    if(this->__next != 0)
     {
-        this->delete(&this->_next);
-        this->_next = 0;
+        this->delete(&this->__next);
+        this->__next = 0;
     }
     
+    free(this->__typeName);
     free(this);
     *list = 0;
 }
@@ -33,52 +36,30 @@ void List_delete(List **list)
 void List_push(List *this, void *value)
 {
     List *list = this;
-    while(list->_next != 0)
+    while(list->__next != 0)
     {
-        list = list->_next;
+        list = list->__next;
     };
     
-    list->_next = newList();
-    list->_next->value = value;
+    list->__next = __newList(list->__typeName, list->__typeSize);
+    list->__next->value = malloc(list->__typeSize);
+    memcpy(list->__next->value, value, list->__typeSize);
 }
 
-void* List_pop(List *list)
+void List_pop(List *list, void *value)
 {
     List *this = list;
     List *prev = list;
     void *ret;
 
-    while(this->_next != 0)
+    while(this->__next != 0)
     {
         prev = this;
-        this = this->_next;
+        this = this->__next;
     };
 
-    ret = this->value;
+    memcpy(value, this->value, list->__typeSize);
+    free(this->value);
     free(this);
-    prev->_next = 0;
-    
-    return ret;
+    prev->__next = 0;
 }
-
-void List_pushInt(List *this, int value)
-{
-    int *intValue = (int*)malloc(sizeof(int));
-    memcpy(intValue, &value, sizeof(int));
-    this->_push(this, intValue);
-}
-
-int List_popInt(List *this)
-{
-    int *value;
-    value = this->_pop(this);
-
-    int intValue = 0;
-    memcpy(&intValue, value, sizeof(int));
-
-    free(value);
-    return intValue;
-}
-
-
-

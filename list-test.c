@@ -4,15 +4,22 @@
 
 int main(int argc, char **argv)
 {
-    List* list = newList();
+    List* list = newList(int);
+    int value = 0;
 
-    list->pushInt(list, 12);
-    list->pushInt(list, 8);
-    list->pushInt(list, 255);
+    value = 12;
+    list->push(list, &value);
+    value = 8;
+    list->push(list, &value);
+    value = 89898;
+    list->push(list, &value);
 
-    printf("%d\n", list->popInt(list));
-    printf("%d\n", list->popInt(list));
-    printf("%d\n", list->popInt(list));
+    list->pop(list, &value);
+    printf("%d\n", value);
+    list->pop(list, &value);
+    printf("%d\n", value);
+    list->pop(list, &value);
+    printf("%d\n", value);
 
     list->delete(&list);
 
