@@ -18,11 +18,11 @@ typedef struct List_s
     void *value;
 
     void (*delete)(struct List_s **);
-    void (*push)(struct List_s *, void*);
-    void (*pop)(struct List_s *, void*);
+    int (*push)(struct List_s *, void *);
+    int (*pop)(struct List_s *, void *);
 } List;
 
-List* __newList(const char *typeName, size_t typeSize);
+List *__newList(const char *typeName, size_t typeSize);
 
 /**
  * @brief Create a new List object of item of type TYPE
@@ -50,15 +50,18 @@ void List_delete(List **this);
  *
  * @param this : a pointer to the List
  * @param value : a pointer to the item
+ * @return int : 0 if OK, -1 if error
  */
-void List_push(List *this, void *value);
+int List_push(List *this, void *value);
 
 /**
  * @brief return the last item added to the list
  * 
  * @param this : a pointer ot the List
  * @param value : a pointer to the item - needs to be allocated with the correct size.
+ * @return int : 0 if OK, -1 if error
  */
-void List_pop(List *this, void *value);
+
+int List_pop(List *this, void *value);
 
 #endif // LIST_H
