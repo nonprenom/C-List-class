@@ -10,13 +10,15 @@
  */
 typedef struct List_s
 {
-    const char *__typeName;
-    size_t __typeSize;
-    struct List_s *__next;
-    void (*__free)(struct List_s *);
+    struct private_s
+    {
+        const char *typeName;
+        size_t typeSize;
+        struct List_s *next;
+    } _priv;
 
     void *value;
-
+    
     void (*delete)(struct List_s **);
     int (*push)(struct List_s *, void *);
     int (*pop)(struct List_s *, void *);
@@ -30,13 +32,6 @@ List *__newList(const char *typeName, size_t typeSize);
  * 
  */
 #define newList(TYPE) __newList(#TYPE, sizeof(TYPE))
-
-/**
- * @brief Free the memory for one item of the list
- * 
- * @param list : pointer to one item of the list
- */
-void List_free(List *list);
 
 /**
  * @brief Free the memory and delete the List

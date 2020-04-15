@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <stdio.h>
 
 #include "xmalloc.h"
@@ -12,20 +11,17 @@ List *__newList(const char *typeName, size_t typeSize)
     list = (List *)xmalloc(sizeof(List));
     if (list != 0)
     {
-        list->__typeName = typeName;
-        list->__typeSize = typeSize;
-        list->__next = 0;
-        list->__free = &List_free;
+        list->_priv.typeName = typeName;
+        list->_priv.typeSize = typeSize;
+        list->_priv.next = 0;
 
         list->value = xmalloc(typeSize);
-        if (list->value != 0)
-        {
-            list->delete = &List_delete;
-            list->push = &List_push;
-            list->pop = &List_pop;
-        }
-        else
+        if (list->value == 0)
             perror("__newList() : Unable to allocate the value field.");
+
+        list->delete = &List_delete;
+        list->push = &List_push;
+        list->pop = &List_pop;
     }
     else
         perror("__newList() : Unable to allocate a new List.");
@@ -33,7 +29,7 @@ List *__newList(const char *typeName, size_t typeSize)
     return list;
 }
 
-void List_free(List *list)
+static void List_free(List *list)
 {
     xfree(list->value);
     xfree(list);
@@ -42,8 +38,8 @@ void List_free(List *list)
 void List_delete(List **list)
 {
     List *this = *list;
-    if (this->__next != 0)
-        this->delete (&this->__next);
+    if (this->_priv.next != 0)
+        this->delete (&this->_priv.next);
 
     List_free(this);
     *list = 0;
@@ -52,14 +48,14 @@ void List_delete(List **list)
 int List_push(List *this, void *value)
 {
     List *list = this;
-    while (list->__next != 0)
+    while (list->_priv.next != 0)
     {
-        list = list->__next;
+        list = list->_priv.next;
     };
 
-    list->__next = __newList(list->__typeName, list->__typeSize);
-    if (list->__next != 0)
-        memcpy(list->__next->value, value, list->__typeSize);
+    list->_priv.next = __newList(list->_priv.typeName, list->_priv.typeSize);
+    if (list->_priv.next != 0)
+        memcpy(list->_priv.next->value, value, list->_priv.typeSize);
     else
     {
         fprintf(stderr, "List_push() : Unable to create the next List.\n");
@@ -75,17 +71,17 @@ int List_pop(List *list, void *value)
     List *prev = list;
     void *ret;
 
-    while (this->__next != 0)
+    while (this->_priv.next != 0)
     {
         prev = this;
-        this = this->__next;
+        this = this->_priv.next;
     };
 
     if (this != list)
     {
-        memcpy(value, this->value, list->__typeSize);
+        memcpy(value, this->value, list->_priv.typeSize);
         List_free(this);
-        prev->__next = 0;
+        prev->_priv.next = 0;
     }
     else
     {
